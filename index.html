@@ -13,7 +13,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background-color: #fce4ec; /* 핑크 배경 */
-      /* 배경 패턴은 눈이 잘 보이게 살짝 연하게 조정하거나 그대로 둡니다 */
       background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
       font-family: 'Noto Sans KR', sans-serif;
       display: flex;
@@ -21,7 +20,7 @@
       align-items: center;
       min-height: 100vh;
       overflow: hidden;
-      position: relative; /* 파티클 위치 기준 */
+      position: relative;
     }
 
     /* ★ 눈 내리는 배경 컨테이너 */
@@ -31,8 +30,8 @@
       height: 100%;
       top: 0;
       left: 0;
-      z-index: 0; /* 책보다 뒤에 */
-      pointer-events: none; /* 마우스 클릭 통과 */
+      z-index: 0;
+      pointer-events: none;
     }
 
     /* --- 책(Book) 컨테이너 --- */
@@ -42,7 +41,7 @@
       box-shadow: none; 
       transition: box-shadow 0.5s ease-in-out;
       position: relative;
-      z-index: 10; /* 눈보다 앞에 배치 */
+      z-index: 10;
     }
 
     .book-container.shadow-active {
@@ -171,7 +170,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/tsparticles-slim@2.0.6/tsparticles.slim.bundle.min.js"></script>
 
 <script>
@@ -220,7 +218,7 @@
   calcDDay();
 
 
-  // --- [3] ★ 눈 내리는 효과 (수정됨: 천천히, 적게) ---
+  // --- [3] 눈 내리는 효과 ---
   tsParticles.load("tsparticles", {
     "autoPlay": true,
     "fullScreen": { "enable": true, "zIndex": 0 },
@@ -233,31 +231,41 @@
     "particles": {
       "color": { "value": "#ffffff" },
       "move": {
-        "direction": "bottom",
-        "enable": true,
-        "outModes": { "default": "out" },
-        "random": false,
-        // ★ 속도 조절: 숫자가 작을수록 느려져요 (기존 2 -> 0.8)
-        "speed": 0.8, 
-        "straight": false
+        "direction": "bottom", "enable": true, "outModes": { "default": "out" },
+        "random": false, "speed": 0.8, "straight": false
       },
-      "number": {
-        "density": { "enable": true, "area": 800 },
-        // ★ 눈 개수 조절: 숫자가 작을수록 적게 내려요 (기존 400 -> 80)
-        "value": 80 
-      },
-      "opacity": { 
-        "value": 0.7,
-        "animation": { "enable": true, "speed": 0.5, "minimumValue": 0.1 } 
-      },
+      "number": { "density": { "enable": true, "area": 800 }, "value": 80 },
+      "opacity": { "value": 0.7, "animation": { "enable": true, "speed": 0.5, "minimumValue": 0.1 } },
       "shape": { "type": "circle" },
-      "size": { 
-        "value": { "min": 2, "max": 6 } // 눈송이 크기 다양하게
-      },
-      // 눈이 좌우로 살랑살랑 흔들리는 효과
+      "size": { "value": { "min": 2, "max": 6 } },
       "wobble": { "enable": true, "distance": 10, "speed": 5 }, 
       "zIndex": { "value": 0 }
     }
+  });
+
+  // --- [4] ★ 마우스 휠로 책 넘기기 (추가된 부분) ---
+  let isFlipping = false; // 중복 넘김 방지 플래그
+
+  window.addEventListener('wheel', (e) => {
+    // 1. 이미 책이 넘어가는 중이라면 스크롤 무시
+    if (isFlipping) return;
+
+    // 2. 스크롤 방향 감지
+    if (e.deltaY > 0) {
+      // 휠을 아래로 내림 -> 다음 페이지
+      pageFlip.flipNext();
+    } else if (e.deltaY < 0) {
+      // 휠을 위로 올림 -> 이전 페이지
+      pageFlip.flipPrev();
+    }
+
+    // 3. 잠금 설정 (책이 넘어가는 동안 스크롤 무시)
+    isFlipping = true;
+
+    // 4. 일정 시간(0.8초) 뒤에 다시 스크롤 가능하게 풀기
+    setTimeout(() => {
+      isFlipping = false;
+    }, 800); // 800ms = 0.8초
   });
 </script>
 
