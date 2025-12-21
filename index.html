@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>우리의 커플 다이어리 💕</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/d776e0b347.js" crossorigin="anonymous"></script>
+
+  <style>
+    /* --- 기본 설정 --- */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #fce4ec; /* 핑크 배경 */
+      /* 배경 패턴은 눈이 잘 보이게 살짝 연하게 조정하거나 그대로 둡니다 */
+      background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
+      font-family: 'Noto Sans KR', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative; /* 파티클 위치 기준 */
+    }
+
+    /* ★ 눈 내리는 배경 컨테이너 */
+    #tsparticles {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 0; /* 책보다 뒤에 */
+      pointer-events: none; /* 마우스 클릭 통과 */
+    }
+
+    /* --- 책(Book) 컨테이너 --- */
+    .book-container {
+      width: 900px; 
+      height: 600px;
+      box-shadow: none; 
+      transition: box-shadow 0.5s ease-in-out;
+      position: relative;
+      z-index: 10; /* 눈보다 앞에 배치 */
+    }
+
+    .book-container.shadow-active {
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    }
+
+    /* --- 페이지 공통 스타일 --- */
+    .page {
+      background-color: #fdfdfd;
+      padding: 40px;
+      border: 1px solid #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      width: 450px !important; 
+      height: 600px !important;
+    }
+    
+    .page::before {
+      content: "";
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+      opacity: 0.5; pointer-events: none;
+    }
+
+    .page-num {
+      position: absolute; bottom: 20px; font-size: 0.8rem; color: #aaa; z-index: 10;
+    }
+    .page:nth-child(odd) .page-num { right: 20px; }
+    .page:nth-child(even) .page-num { left: 20px; }
+
+    /* --- 폰트 및 꾸미기 --- */
+    .hand-font { font-family: 'Nanum Pen Script', cursive; font-size: 2rem; }
+    .date-font { font-family: 'Nanum Pen Script', cursive; color: #888; font-size: 1.5rem; margin-bottom: 10px; display: block; }
+
+    /* [Cover] */
+    .page-cover {
+      background-color: #ff80ab; color: white;
+      text-align: center; justify-content: center; align-items: center;
+      border-left: 5px solid #c51162;
+    }
+    .page-cover h1 { font-family: 'Nanum Pen Script'; font-size: 4rem; margin-bottom: 20px; }
+    .page-cover i { font-size: 3rem; animation: heartbeat 1.5s infinite; }
+
+    /* [Page 1] D-Day */
+    .d-day-box {
+      text-align: center; margin-top: 50px; border: 3px dashed #ff4081;
+      padding: 30px; border-radius: 20px; background: #fff0f5;
+    }
+    .d-day-title { font-size: 1.2rem; color: #555; }
+    .d-day-count { font-size: 4rem; font-weight: bold; color: #e91e63; font-family: 'Nanum Pen Script'; margin: 10px 0; }
+    .d-day-date { color: #777; font-size: 0.9rem; }
+
+    /* [Page Content] */
+    .polaroid {
+      background: #fff; padding: 10px 10px 40px 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+      transform: rotate(-3deg); width: 80%; margin: 20px auto; border: 1px solid #ddd;
+    }
+    .polaroid img { width: 100%; height: auto; display: block; }
+    .polaroid-caption { text-align: center; font-family: 'Nanum Pen Script'; font-size: 1.5rem; color: #555; margin-top: 10px; }
+
+    .diary-text {
+      line-height: 2; background: linear-gradient(to bottom, transparent 95%, #eee 98%);
+      background-size: 100% 40px; font-family: 'Nanum Pen Script'; font-size: 1.6rem; color: #444; padding: 0 10px;
+    }
+
+    @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+  </style>
+</head>
+<body>
+
+<div id="tsparticles"></div>
+
+<div id="book" class="book-container">
+  <div class="page page-cover">
+    <h1>Our Love Story</h1>
+    <i class="fa-solid fa-heart"></i>
+    <p style="margin-top: 20px; font-size: 1.2rem;">우리의 소중한 순간들</p>
+  </div>
+
+  <div class="page">
+    <div class="d-day-box">
+      <p class="d-day-title">우리가 사랑한 지</p>
+      <div id="d-day-display" class="d-day-count">D+250</div>
+      <p id="start-date-display" class="d-day-date">Since 202X.XX.XX</p>
+    </div>
+    <div style="margin-top: 40px; text-align: center;">
+      <p class="hand-font" style="font-size: 1.8rem;">"너와 함께한 모든 날이<br>눈부시게 아름다웠어"</p>
+    </div>
+    <span class="page-num">1</span>
+  </div>
+
+  <div class="page">
+    <span class="date-font">2024년 12월 18일, 맑음 ☀️</span>
+    <div class="polaroid">
+      <img src="https://images.pexels.com/photos/1024960/pexels-photo-1024960.jpeg?auto=compress&cs=tinysrgb&w=600" alt="커플사진">
+      <div class="polaroid-caption">행복했던 데이트 💕</div>
+    </div>
+    <p class="diary-text">오늘은 우리가 만난 지 250일이 되는 날!<br>같이 맛있는 것도 먹고 산책도 했다.<br>앞으로도 300일, 1년, 10년...<br>평생 함께하자 사랑해!</p>
+    <span class="page-num">2</span>
+  </div>
+
+  <div class="page">
+    <span class="date-font">2024년 5월 5일, 놀이공원 🎡</span>
+    <div class="polaroid" style="transform: rotate(2deg);">
+      <img src="https://images.pexels.com/photos/1417255/pexels-photo-1417255.jpeg?auto=compress&cs=tinysrgb&w=600" alt="놀이공원">
+    </div>
+    <p class="diary-text">사람이 정말 많았지만,<br>네 손을 잡고 있어서 하나도 안 힘들었어.<br>회전목마 앞에서 찍은 사진은<br>내 인생 최고의 사진이야!</p>
+    <span class="page-num">3</span>
+  </div>
+
+  <div class="page">
+    <div style="border: 2px solid #ff4081; padding: 20px; height: 100%; border-radius: 10px;">
+      <h2 class="hand-font" style="text-align: center; color: #e91e63;">To. 내 사랑</h2>
+      <br>
+      <p class="diary-text" style="background: none;">항상 내 옆에 있어줘서 고마워.<br>가끔 투정 부려도 다 받아주는<br>네가 있어서 나는 세상에서<br>제일 행복한 사람이야.<br><br>우리 다이어리에 앞으로<br>더 예쁜 추억 많이 채워넣자.<br><br><br><span style="float: right;">- 너의 짝꿍이 -</span></p>
+    </div>
+    <span class="page-num">4</span>
+  </div>
+
+  <div class="page page-cover">
+    <h2>To Be Continued...</h2>
+    <p>우리의 이야기는 계속됩니다</p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/tsparticles-slim@2.0.6/tsparticles.slim.bundle.min.js"></script>
+
+<script>
+  // --- [1] 책 넘김 효과 설정 ---
+  const bookElement = document.getElementById('book');
+  const pageFlip = new St.PageFlip(bookElement, {
+    width: 450, height: 600, size: 'fixed', usePortrait: false, 
+    minWidth: 300, maxWidth: 1000, minHeight: 400, maxHeight: 1000,
+    maxShadowOpacity: 0.5, showCover: true, mobileScrollSupport: false 
+  });
+  pageFlip.loadFromHTML(document.querySelectorAll('.page'));
+
+  // 그림자 제어 함수
+  function updateShadow() {
+    const currentPageIndex = pageFlip.getCurrentPageIndex();
+    const totalPages = pageFlip.getPageCount();
+    if (currentPageIndex === 0 || currentPageIndex === totalPages - 1) {
+      bookElement.classList.remove('shadow-active');
+    } else {
+      bookElement.classList.add('shadow-active');
+    }
+  }
+  setTimeout(updateShadow, 100);
+  pageFlip.on('flip', updateShadow);
+
+
+  // --- [2] D-Day 자동 계산 ---
+  const today = new Date();
+  const startDate = new Date(today);
+  startDate.setDate(today.getDate() - 249); // 250일째로 세팅
+  const dDayDisplay = document.getElementById('d-day-display');
+  const startDateDisplay = document.getElementById('start-date-display');
+
+  function calcDDay() {
+    const now = new Date();
+    const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+    const current = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const diff = current - start;
+    const day = diff / (1000 * 60 * 60 * 24) + 1;
+    dDayDisplay.innerText = "D+" + Math.floor(day);
+    const year = startDate.getFullYear();
+    const month = startDate.getMonth() + 1;
+    const date = startDate.getDate();
+    startDateDisplay.innerText = `Since ${year}.${month}.${date}`;
+  }
+  calcDDay();
+
+
+  // --- [3] ★ 눈 내리는 효과 (수정됨: 천천히, 적게) ---
+  tsParticles.load("tsparticles", {
+    "autoPlay": true,
+    "fullScreen": { "enable": true, "zIndex": 0 },
+    "detectRetina": true,
+    "fpsLimit": 120,
+    "interactivity": {
+      "detectsOn": "window",
+      "events": { "resize": true }
+    },
+    "particles": {
+      "color": { "value": "#ffffff" },
+      "move": {
+        "direction": "bottom",
+        "enable": true,
+        "outModes": { "default": "out" },
+        "random": false,
+        // ★ 속도 조절: 숫자가 작을수록 느려져요 (기존 2 -> 0.8)
+        "speed": 0.8, 
+        "straight": false
+      },
+      "number": {
+        "density": { "enable": true, "area": 800 },
+        // ★ 눈 개수 조절: 숫자가 작을수록 적게 내려요 (기존 400 -> 80)
+        "value": 80 
+      },
+      "opacity": { 
+        "value": 0.7,
+        "animation": { "enable": true, "speed": 0.5, "minimumValue": 0.1 } 
+      },
+      "shape": { "type": "circle" },
+      "size": { 
+        "value": { "min": 2, "max": 6 } // 눈송이 크기 다양하게
+      },
+      // 눈이 좌우로 살랑살랑 흔들리는 효과
+      "wobble": { "enable": true, "distance": 10, "speed": 5 }, 
+      "zIndex": { "value": 0 }
+    }
+  });
+</script>
+
+</body>
+</html>
