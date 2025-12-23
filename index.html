@@ -3,269 +3,510 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>우리의 커플 다이어리 💕</title>
+  <title>상호 & 수완의 러브스토리 💕</title>
   
-  <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@300;400&family=Gaegu&display=swap" rel="stylesheet">
   <script src="https://kit.fontawesome.com/d776e0b347.js" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tsparticles-slim@2.0.6/tsparticles.slim.bundle.min.js"></script>
 
   <style>
-    /* --- 기본 설정 --- */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; width: 100%; }
+    
     body {
-      background-color: #fce4ec; /* 핑크 배경 */
-      background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
+      background: #fff4d3;
       font-family: 'Noto Sans KR', sans-serif;
+      overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      overflow: hidden;
-      position: relative;
     }
 
-    /* ★ 눈 내리는 배경 컨테이너 */
-    #tsparticles {
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    /* --- 책(Book) 컨테이너 --- */
-    .book-container {
-      width: 900px; 
-      height: 600px;
-      box-shadow: none; 
-      transition: box-shadow 0.5s ease-in-out;
-      position: relative;
-      z-index: 10;
-    }
-
-    .book-container.shadow-active {
-      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-    }
-
-    /* --- 페이지 공통 스타일 --- */
-    .page {
-      background-color: #fdfdfd;
-      padding: 40px;
-      border: 1px solid #e0e0e0;
+    .book-wrapper {
+      perspective: 1500px;
       display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      width: 450px !important; 
-      height: 600px !important;
+      justify-content: center;
+      align-items: center;
+      width: 100%; height: 100%;
+    }
+
+    .book {
+      transform-style: preserve-3d;
+      transform: rotateX(30deg) rotateY(0deg) rotateZ(-30deg);
+      transition: transform 1s ease-in-out;
+      position: relative;
+      width: 350px; height: 500px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      .book {
+        transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) !important; 
+        width: 320px; height: 480px;
+      }
+      .book-wrapper { perspective: 800px; overflow: hidden; }
+    }
+
+    .book .side {
+      width: 40px; height: 100%; background: #c75b53;
+      position: absolute; left: -40px; top: 0;
+      transform-origin: 100% 100%; transform: rotateY(-90deg);
+    }
+    .book .bottom {
+      width: 100%; height: 40px; background: #e2e2e2;
+      position: absolute; bottom: 0; left: 0;
+      transform-origin: 100% 100%; transform: rotateX(90deg);
+    }
+    .book .shadow {
+      width: 100%; height: 100%; position: absolute; top: 0; left: 0;
+      background: transparent; transform: translateZ(-40px);
+      box-shadow: -30px 30px 20px rgba(0,0,0,0.3); z-index: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .book .paper {
+      width: 100%; 
+      height: 100%; 
+      position: absolute; 
+      top: 0; 
+      left: 0;
+      transition: transform 1s;
+      transform-origin: 0 50%; 
+      transform-style: preserve-3d;
     }
     
-    .page::before {
-      content: "";
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
-      opacity: 0.5; pointer-events: none;
+    .book .paper.open {
+      transform: rotateY(-160deg);
     }
 
-    .page-num {
-      position: absolute; bottom: 20px; font-size: 0.8rem; color: #aaa; z-index: 10;
+    .book .page {
+      width: 100%; 
+      height: 100%; 
+      position: absolute;
+      top: 0;
+      left: 0;
+      background-color: #fdfdfd; 
+      overflow: hidden;
+      backface-visibility: hidden; 
+      border: 1px solid #e0e0e0;
     }
-    .page:nth-child(odd) .page-num { right: 20px; }
-    .page:nth-child(even) .page-num { left: 20px; }
-
-    /* --- 폰트 및 꾸미기 --- */
-    .hand-font { font-family: 'Nanum Pen Script', cursive; font-size: 2rem; }
-    .date-font { font-family: 'Nanum Pen Script', cursive; color: #888; font-size: 1.5rem; margin-bottom: 10px; display: block; }
-
-    /* [Cover] */
-    .page-cover {
-      background-color: #ff80ab; color: white;
-      text-align: center; justify-content: center; align-items: center;
-      border-left: 5px solid #c51162;
+    
+    .book .page.front { 
+      z-index: 2; 
+      padding: 20px; 
+      display: flex; 
+      flex-direction: column; 
     }
-    .page-cover h1 { font-family: 'Nanum Pen Script'; font-size: 4rem; margin-bottom: 20px; }
-    .page-cover i { font-size: 3rem; animation: heartbeat 1.5s infinite; }
+    
+    .book .page.back { 
+      z-index: 1; 
+      background-color: #fdfdfd;
+      transform: rotateY(180deg);
+    }
 
-    /* [Page 1] D-Day */
+    /* 모눈종이 패턴 - 앞면 */
+    .book .paper:not(#p1) .page.front::before {
+      content: ""; 
+      position: absolute; 
+      top: 0; left: 0; 
+      width: 100%; height: 100%;
+      background-image: 
+        linear-gradient(#e0e0e0 1px, transparent 1px),
+        linear-gradient(90deg, #e0e0e0 1px, transparent 1px);
+      background-size: 20px 20px;
+      opacity: 0.5; 
+      pointer-events: none; 
+      z-index: 0;
+    }
+
+    /* 뒷면 모눈종이 - 연하게 */
+    .book .paper:not(#p1):not(#p5) .page.back::before {
+      content: ""; 
+      position: absolute; 
+      top: 0; left: 0; 
+      width: 100%; height: 100%;
+      background-color: #fdfdfd;
+      background-image: 
+        linear-gradient(#e0e0e0 1px, transparent 1px),
+        linear-gradient(90deg, #e0e0e0 1px, transparent 1px);
+      background-size: 20px 20px;
+      opacity: 0.5; 
+      pointer-events: none; 
+      z-index: 1;
+    }
+
+    /* 초기 z-index */
+    #p1 { z-index: 50; } 
+    #p2 { z-index: 40; } 
+    #p3 { z-index: 30; } 
+    #p4 { z-index: 20; } 
+    #p5 { z-index: 10; }
+
+    /* 디자인 요소 */
+    .hand-font { font-family: 'Nanum Pen Script', cursive; font-size: 1.8rem; color: #444; z-index: 5; }
+    .cute-font { font-family: 'Gaegu', cursive; z-index: 5; }
+    .title-font { font-family: 'Nanum Pen Script', cursive; font-size: 3.5rem; color: #fff; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); }
+
+    /* 표지 스타일 */
+    .cover-page {
+      background-color: #ff8a80 !important; 
+      border-left: 10px solid #c75b53; 
+      color: white;
+      justify-content: center; 
+      align-items: center;
+    }
+    .cover-border { 
+      border: none; 
+      padding: 20px; 
+      width: 80%; 
+      height: 80%; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: center; 
+      align-items: center; 
+    }
+
+    /* 표지 뒷면 단색 */
+    #p1 .page.back {
+      background-color: #f0f0f0 !important;
+    }
+
+    .sticker {
+      position: absolute;
+      font-size: 3.5rem;
+      z-index: 20;
+      text-shadow: 
+        3px 3px 0 #fff, -3px -3px 0 #fff, 
+        3px -3px 0 #fff, -3px 3px 0 #fff,
+        3px 0px 0 #fff, -3px 0px 0 #fff, 
+        0px 3px 0 #fff, 0px -3px 0 #fff;
+      filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2)); 
+      transform: rotate(10deg);
+      cursor: default;
+    }
+
+    .photo-frame {
+      position: absolute;
+      background: #fff;
+      padding: 5px 5px 25px 5px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      border: 1px solid #ddd;
+      z-index: 5;
+      transition: transform 0.3s;
+    }
+    .photo-frame:hover { transform: scale(1.05) rotate(0deg) !important; z-index: 25; }
+    .photo-frame img { width: 100%; display: block; }
+    
+    .tape {
+      position: absolute; width: 80px; height: 25px;
+      background-color: rgba(255, 235, 59, 0.7);
+      top: -12px; left: 50%; transform: translateX(-50%) rotate(-2deg);
+      z-index: 30;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      opacity: 0.8;
+    }
+
+    .bubble {
+      position: absolute;
+      background: #fff;
+      border: 2px solid #444;
+      border-radius: 20px;
+      padding: 10px 15px;
+      font-family: 'Gaegu', cursive;
+      font-size: 1.1rem;
+      box-shadow: 3px 3px 0px rgba(0,0,0,0.1);
+      z-index: 15;
+      text-align: center;
+    }
+    .bubble::after {
+      content: ''; position: absolute; bottom: -12px; left: 20px;
+      border-width: 12px 10px 0; border-style: solid;
+      border-color: #444 transparent; display: block; width: 0;
+    }
+
     .d-day-box {
-      text-align: center; margin-top: 50px; border: 3px dashed #ff4081;
-      padding: 30px; border-radius: 20px; background: #fff0f5;
+      text-align: center; margin-top: 40px; padding: 20px; z-index: 5;
+      border: 3px dashed #ff80ab; border-radius: 20px; background: #fff0f5;
     }
-    .d-day-title { font-size: 1.2rem; color: #555; }
-    .d-day-count { font-size: 4rem; font-weight: bold; color: #e91e63; font-family: 'Nanum Pen Script'; margin: 10px 0; }
-    .d-day-date { color: #777; font-size: 0.9rem; }
+    .count { font-size: 4rem; color: #e91e63; font-family: 'Nanum Pen Script'; font-weight: bold; }
 
-    /* [Page Content] */
-    .polaroid {
-      background: #fff; padding: 10px 10px 40px 10px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-      transform: rotate(-3deg); width: 80%; margin: 20px auto; border: 1px solid #ddd;
+    #loading-screen {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background-color: #fff4d3; z-index: 9999;
+        display: flex; justify-content: center; align-items: center; flex-direction: column;
+        transition: opacity 0.8s;
     }
-    .polaroid img { width: 100%; height: auto; display: block; }
-    .polaroid-caption { text-align: center; font-family: 'Nanum Pen Script'; font-size: 1.5rem; color: #555; margin-top: 10px; }
+    #loading-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
-    .diary-text {
-      line-height: 2; background: linear-gradient(to bottom, transparent 95%, #eee 98%);
-      background-size: 100% 40px; font-family: 'Nanum Pen Script'; font-size: 1.6rem; color: #444; padding: 0 10px;
+    /* ★★★ 작은 하트 (색상: #f07b71, 사이즈 줄임) ★★★ */
+    .big-heart {
+      width: 50px;
+      height: 50px;
+      background-color: #f07b71;
+      position: relative;
+      transform: rotate(-45deg);
+      animation: heartbeat 1.5s ease-in-out infinite;
     }
-
-    @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+    .big-heart::before,
+    .big-heart::after {
+      content: "";
+      width: 50px;
+      height: 50px;
+      background-color: #f07b71;
+      border-radius: 50%;
+      position: absolute;
+    }
+    .big-heart::before {
+      top: -25px;
+      left: 0;
+    }
+    .big-heart::after {
+      left: 25px;
+      top: 0;
+    }
+    @keyframes heartbeat {
+      0%, 100% { transform: rotate(-45deg) scale(1); }
+      50% { transform: rotate(-45deg) scale(1.08); }
+    }
   </style>
 </head>
 <body>
 
-<div id="tsparticles"></div>
+<div id="loading-screen">
+  <i class="fa-solid fa-heart fa-beat" style="font-size: 4rem; color: #ff8a80;"></i>
+  <p style="margin-top: 20px; font-family: 'Nanum Pen Script'; font-size: 2rem; color: #c75b53;">다이어리 꾸미는 중...</p>
+</div>
+<div id="tsparticles" style="position:fixed; width:100%; height:100%; z-index:0; pointer-events:none;"></div>
 
-<div id="book" class="book-container">
-  <div class="page page-cover">
-    <h1>Our Love Story</h1>
-    <i class="fa-solid fa-heart"></i>
-    <p style="margin-top: 20px; font-size: 1.2rem;">우리의 소중한 순간들</p>
-  </div>
+<div class="book-wrapper">
+  <div class="book" id="diary-book">
+    <div class="side"></div> 
+    <div class="bottom"></div> 
+    <div class="shadow"></div>
 
-  <div class="page">
-    <div class="d-day-box">
-      <p class="d-day-title">우리가 사랑한 지</p>
-      <div id="d-day-display" class="d-day-count">D+250</div>
-      <p id="start-date-display" class="d-day-date">Since 202X.XX.XX</p>
+    <!-- 표지 -->
+    <div class="paper" id="p1">
+      <div class="page front cover-page">
+        <div class="cover-border">
+          <h2 class="title-font">Our Love</h2>
+          <h1 class="title-font" style="font-size: 5rem;">Diary</h1>
+          <p class="hand-font" style="color: white; margin-top: 60px;">Scroll or Click →</p>
+        </div>
+      </div>
+      <div class="page back"></div>
     </div>
-    <div style="margin-top: 40px; text-align: center;">
-      <p class="hand-font" style="font-size: 1.8rem;">"너와 함께한 모든 날이<br>눈부시게 아름다웠어"</p>
-    </div>
-    <span class="page-num">1</span>
-  </div>
 
-  <div class="page">
-    <span class="date-font">2024년 12월 18일, 맑음 ☀️</span>
-    <div class="polaroid">
-      <img src="https://images.pexels.com/photos/1024960/pexels-photo-1024960.jpeg?auto=compress&cs=tinysrgb&w=600" alt="커플사진">
-      <div class="polaroid-caption">행복했던 데이트 💕</div>
+    <!-- 페이지 2 -->
+    <div class="paper" id="p2">
+      <div class="page front">
+        <div class="d-day-box">
+          <p class="hand-font">우리가 사랑한 지</p>
+          <div id="d-day-count" class="count">D+1</div>
+          <p style="color: #888; font-size: 0.9rem;">Since 2025.04.13</p>
+        </div>
+        <div style="margin-top: 50px; text-align: center;">
+          <p class="hand-font" style="font-size: 1.6rem;">"매일매일 더 사랑해 💕"</p>
+        </div>
+      </div>
+      <div class="page back"></div>
     </div>
-    <p class="diary-text">오늘은 우리가 만난 지 250일이 되는 날!<br>같이 맛있는 것도 먹고 산책도 했다.<br>앞으로도 300일, 1년, 10년...<br>평생 함께하자 사랑해!</p>
-    <span class="page-num">2</span>
-  </div>
 
-  <div class="page">
-    <span class="date-font">2024년 5월 5일, 놀이공원 🎡</span>
-    <div class="polaroid" style="transform: rotate(2deg);">
-      <img src="https://images.pexels.com/photos/1417255/pexels-photo-1417255.jpeg?auto=compress&cs=tinysrgb&w=600" alt="놀이공원">
+    <!-- 페이지 3 -->
+    <div class="paper" id="p3">
+      <div class="page front" style="position: relative;"> 
+        <div style="position:absolute; top:20px; left:20px; background:#ffeb3b; padding:5px 15px; transform:rotate(-2deg); font-family:'Gaegu'; font-weight:bold; font-size:1.2rem; box-shadow:2px 2px 2px rgba(0,0,0,0.1); z-index:10;">
+          2025.04.13 ☀️
+        </div>
+
+        <div class="photo-frame" style="width: 150px; top: 70px; left: 15px; transform: rotate(-6deg);">
+          <div class="tape" style="background:rgba(255,150,150,0.6); transform: translateX(-50%) rotate(-5deg);"></div>
+          <img src="https://images.pexels.com/photos/1024960/pexels-photo-1024960.jpeg?auto=compress&cs=tinysrgb&w=400" alt="여의도">
+        </div>
+
+        <div class="photo-frame" style="width: 140px; top: 200px; right: 15px; transform: rotate(4deg);">
+          <div class="tape" style="background:rgba(100,200,255,0.6); transform: translateX(-50%) rotate(3deg);"></div>
+          <img src="https://images.pexels.com/photos/291528/pexels-photo-291528.jpeg?auto=compress&cs=tinysrgb&w=400" alt="디저트">
+        </div>
+
+        <div class="sticker" style="top: 300px; left: 30px;">🌸</div>
+        <div class="sticker" style="top: 150px; right: 10px; font-size: 2.5rem;">🍰</div>
+
+        <div style="position:absolute; bottom:40px; left:20px; width:90%;">
+          <p class="hand-font" style="font-size:1.4rem; line-height:1.4; background:rgba(255,255,255,0.7);">
+            여의도 벚꽃 만개한 날!<br>
+            사람 진짜 많았지만 너무 예뻤다.<br>
+            오빠랑 먹은 케이크도 짱맛 💕
+          </p>
+        </div>
+      </div>
+      <div class="page back"></div>
     </div>
-    <p class="diary-text">사람이 정말 많았지만,<br>네 손을 잡고 있어서 하나도 안 힘들었어.<br>회전목마 앞에서 찍은 사진은<br>내 인생 최고의 사진이야!</p>
-    <span class="page-num">3</span>
-  </div>
 
-  <div class="page">
-    <div style="border: 2px solid #ff4081; padding: 20px; height: 100%; border-radius: 10px;">
-      <h2 class="hand-font" style="text-align: center; color: #e91e63;">To. 내 사랑</h2>
-      <br>
-      <p class="diary-text" style="background: none;">항상 내 옆에 있어줘서 고마워.<br>가끔 투정 부려도 다 받아주는<br>네가 있어서 나는 세상에서<br>제일 행복한 사람이야.<br><br>우리 다이어리에 앞으로<br>더 예쁜 추억 많이 채워넣자.<br><br><br><span style="float: right;">- 너의 짝꿍이 -</span></p>
+    <!-- 페이지 4 -->
+    <div class="paper" id="p4">
+      <div class="page front" style="position: relative;">
+        <div class="bubble" style="top: 50px; right: 20px; transform: rotate(5deg);">
+          "오늘부터 우리 1일이야!"
+        </div>
+
+        <div class="photo-frame" style="width: 220px; top: 120px; left: 50%; transform: translateX(-50%) rotate(-2deg); padding-bottom: 40px;">
+          <div class="tape" style="background:rgba(100,255,100,0.5); width:100px;"></div>
+          <img src="https://images.pexels.com/photos/1417255/pexels-photo-1417255.jpeg?auto=compress&cs=tinysrgb&w=400" alt="커플사진">
+          <div class="hand-font" style="text-align:center; margin-top:10px; color:#555;">상호 ❤️ 수완</div>
+        </div>
+
+        <div class="sticker" style="top: 330px; right: 30px; transform: rotate(-10deg);">🥰</div>
+        <div class="sticker" style="top: 360px; left: 20px; font-size: 2.5rem; transform: rotate(15deg);">💌</div>
+
+        <div style="position:absolute; bottom:30px; left:20px; width:90%; background:rgba(255,255,255,0.7); padding:10px; border-radius:10px;">
+          <p class="hand-font" style="font-size:1.3rem;">
+            집 앞 벚꽃나무 아래서...<br>
+            상호 오빠가 고백했다!! (심쿵)<br>
+            내 인생 최고의 날 💖<br>
+            잘 부탁해 내 남자친구!
+          </p>
+        </div>
+      </div>
+      <div class="page back"></div>
     </div>
-    <span class="page-num">4</span>
-  </div>
 
-  <div class="page page-cover">
-    <h2>To Be Continued...</h2>
-    <p>우리의 이야기는 계속됩니다</p>
+    <!-- 페이지 5: 편지 + 뒤표지 -->
+    <div class="paper" id="p5">
+      <div class="page front">
+        <div style="border: 2px solid #ef9a9a; height: 100%; padding: 20px; border-radius: 10px; background:white;">
+          <h2 class="hand-font" style="text-align: center; color: #e91e63;">To. 상호 오빠</h2>
+          <br>
+          <p class="note-line" style="line-height: 2;">
+            항상 내 옆에 있어줘서 고마워.<br>
+            가끔 투정 부려도 다 받아주는<br>
+            오빠가 있어서 나는 세상에서<br>
+            제일 행복한 사람이야.<br><br>
+            우리 앞으로도 예쁜 추억<br>
+            많이 채워나가자!<br>
+            사랑해 ❤️
+          </p>
+        </div>
+      </div>
+      <!-- ★★★ 마지막 페이지 (뒤표지) - 그림자 없음 ★★★ -->
+      <div class="page back" style="background-color: #ff8a80 !important; border-right: 10px solid #c75b53; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: none !important;">
+        <div class="big-heart"></div>
+        <h1 class="title-font" style="font-size: 3.5rem; margin-top: 30px;">...ing</h1>
+        <p class="hand-font" style="color: white; margin-top: 20px; text-align: center; line-height: 1.6;">
+          우리의 이야기는<br>계속됩니다
+        </p>
+        <p style="color: rgba(255,255,255,0.8); margin-top: 30px; font-size: 0.9rem;">
+          To be continued... 💕
+        </p>
+      </div>
+    </div>
+
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tsparticles-slim@2.0.6/tsparticles.slim.bundle.min.js"></script>
-
 <script>
-  // --- [1] 책 넘김 효과 설정 ---
-  const bookElement = document.getElementById('book');
-  const pageFlip = new St.PageFlip(bookElement, {
-    width: 450, height: 600, size: 'fixed', usePortrait: false, 
-    minWidth: 300, maxWidth: 1000, minHeight: 400, maxHeight: 1000,
-    maxShadowOpacity: 0.5, showCover: true, mobileScrollSupport: false 
-  });
-  pageFlip.loadFromHTML(document.querySelectorAll('.page'));
-
-  // 그림자 제어 함수
-  function updateShadow() {
-    const currentPageIndex = pageFlip.getCurrentPageIndex();
-    const totalPages = pageFlip.getPageCount();
-    if (currentPageIndex === 0 || currentPageIndex === totalPages - 1) {
-      bookElement.classList.remove('shadow-active');
-    } else {
-      bookElement.classList.add('shadow-active');
-    }
-  }
-  setTimeout(updateShadow, 100);
-  pageFlip.on('flip', updateShadow);
-
-
-  // --- [2] D-Day 자동 계산 ---
-  const today = new Date();
-  const startDate = new Date(today);
-  startDate.setDate(today.getDate() - 249); // 250일째로 세팅
-  const dDayDisplay = document.getElementById('d-day-display');
-  const startDateDisplay = document.getElementById('start-date-display');
+  const totalPapers = 5;
+  let currentPage = 0; 
+  let isFlipping = false;
 
   function calcDDay() {
-    const now = new Date();
-    const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-    const current = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const diff = current - start;
-    const day = diff / (1000 * 60 * 60 * 24) + 1;
-    dDayDisplay.innerText = "D+" + Math.floor(day);
-    const year = startDate.getFullYear();
-    const month = startDate.getMonth() + 1;
-    const date = startDate.getDate();
-    startDateDisplay.innerText = `Since ${year}.${month}.${date}`;
+    const today = new Date(); 
+    const startDate = new Date('2025-04-13'); 
+    const timeDiff = today.getTime() - startDate.getTime();
+    const dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    const finalDay = dayDiff >= 0 ? dayDiff + 1 : dayDiff; 
+    
+    if (dayDiff >= 0) {
+        document.getElementById('d-day-count').innerText = "D+" + finalDay;
+    } else {
+        document.getElementById('d-day-count').innerText = "D" + finalDay;
+    }
   }
-  calcDDay();
 
+  function updateBook() {
+    const papers = document.querySelectorAll('.paper');
+    
+    papers.forEach((paper, index) => {
+      if (index < currentPage) {
+        paper.classList.add('open');
+        paper.style.zIndex = 100 + index;
+      } else {
+        paper.classList.remove('open');
+        paper.style.zIndex = 50 - index;
+      }
+    });
 
-  // --- [3] 눈 내리는 효과 ---
-  tsParticles.load("tsparticles", {
-    "autoPlay": true,
-    "fullScreen": { "enable": true, "zIndex": 0 },
-    "detectRetina": true,
-    "fpsLimit": 120,
-    "interactivity": {
-      "detectsOn": "window",
-      "events": { "resize": true }
-    },
-    "particles": {
-      "color": { "value": "#ffffff" },
-      "move": {
-        "direction": "bottom", "enable": true, "outModes": { "default": "out" },
-        "random": false, "speed": 0.8, "straight": false
-      },
-      "number": { "density": { "enable": true, "area": 800 }, "value": 80 },
-      "opacity": { "value": 0.7, "animation": { "enable": true, "speed": 0.5, "minimumValue": 0.1 } },
-      "shape": { "type": "circle" },
-      "size": { "value": { "min": 2, "max": 6 } },
-      "wobble": { "enable": true, "distance": 10, "speed": 5 }, 
-      "zIndex": { "value": 0 }
+    const shadow = document.querySelector('.shadow');
+    const bottom = document.querySelector('.bottom');
+    // ★ 마지막 페이지에서 그림자 + 바닥 완전히 숨김 ★
+    if (currentPage === totalPapers) {
+      shadow.style.display = 'none';
+      bottom.style.display = 'none';
+    } else {
+      shadow.style.display = 'block';
+      bottom.style.display = 'block';
+    }
+
+    const book = document.querySelector('.book');
+    if (window.innerWidth > 768) {
+      if (currentPage > 0) {
+        book.style.transform = 'rotateX(10deg) rotateY(0deg) rotateZ(0deg)';
+      } else {
+        book.style.transform = 'rotateX(30deg) rotateY(0deg) rotateZ(-30deg)';
+      }
+    }
+  }
+
+  window.addEventListener('wheel', (e) => {
+    if (isFlipping) return;
+    if (e.deltaY > 0 && currentPage < totalPapers) {
+      currentPage++; updateBook();
+    } else if (e.deltaY < 0 && currentPage > 0) {
+      currentPage--; updateBook();
+    }
+    isFlipping = true;
+    setTimeout(() => { isFlipping = false; }, 800);
+  });
+
+  document.querySelectorAll('.paper').forEach(paper => {
+    paper.addEventListener('click', function() {
+      if (this.classList.contains('open')) {
+        if (currentPage > 0) { currentPage--; updateBook(); }
+      } else {
+        if (currentPage < totalPapers) { currentPage++; updateBook(); }
+      }
+    });
+  });
+
+  let touchStartY = 0;
+  window.addEventListener('touchstart', (e) => { touchStartY = e.changedTouches[0].screenY; });
+  window.addEventListener('touchend', (e) => {
+    let touchEndY = e.changedTouches[0].screenY;
+    if (isFlipping) return;
+    if (touchStartY - touchEndY > 50 && currentPage < totalPapers) { 
+      currentPage++; updateBook();
+      isFlipping = true; setTimeout(() => { isFlipping = false; }, 800);
+    } else if (touchEndY - touchStartY > 50 && currentPage > 0) { 
+      currentPage--; updateBook();
+      isFlipping = true; setTimeout(() => { isFlipping = false; }, 800);
     }
   });
 
-  // --- [4] ★ 마우스 휠로 책 넘기기 (추가된 부분) ---
-  let isFlipping = false; // 중복 넘김 방지 플래그
-
-  window.addEventListener('wheel', (e) => {
-    // 1. 이미 책이 넘어가는 중이라면 스크롤 무시
-    if (isFlipping) return;
-
-    // 2. 스크롤 방향 감지
-    if (e.deltaY > 0) {
-      // 휠을 아래로 내림 -> 다음 페이지
-      pageFlip.flipNext();
-    } else if (e.deltaY < 0) {
-      // 휠을 위로 올림 -> 이전 페이지
-      pageFlip.flipPrev();
-    }
-
-    // 3. 잠금 설정 (책이 넘어가는 동안 스크롤 무시)
-    isFlipping = true;
-
-    // 4. 일정 시간(0.8초) 뒤에 다시 스크롤 가능하게 풀기
+  window.addEventListener('load', () => {
+    calcDDay();
+    
+    tsParticles.load("tsparticles", {
+      "autoPlay": true, "fullScreen": { "enable": true, "zIndex": 0 }, "detectRetina": true, "fpsLimit": 120,
+      "particles": {
+        "color": { "value": "#ffffff" }, "move": { "direction": "bottom", "enable": true, "speed": 1 },
+        "number": { "density": { "enable": true, "area": 800 }, "value": 60 },
+        "opacity": { "value": 0.5 }, "shape": { "type": "circle" }, "size": { "value": { "min": 2, "max": 5 } }
+      }
+    });
+    
     setTimeout(() => {
-      isFlipping = false;
-    }, 800); // 800ms = 0.8초
+      document.getElementById('loading-screen').classList.add('hidden');
+    }, 800);
   });
 </script>
 
