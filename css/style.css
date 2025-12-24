@@ -437,7 +437,7 @@ body {
   border: 1px solid #ddd;
   z-index: 15;
   transition: transform 0.3s;
-  width: 210px;
+  width: 220px;
 }
 
 .photo-frame-big:hover {
