@@ -3,512 +3,247 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>상호 & 수완의 러브스토리 💕</title>
+  <title>상호 & 수완의 러브스토리💕</title>
   
+  <!-- 폰트 -->
   <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@300;400&family=Gaegu&display=swap" rel="stylesheet">
+  
+  <!-- 아이콘 -->
   <script src="https://kit.fontawesome.com/d776e0b347.js" crossorigin="anonymous"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- 파티클 효과 -->
   <script src="https://cdn.jsdelivr.net/npm/tsparticles-slim@2.0.6/tsparticles.slim.bundle.min.js"></script>
-
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { height: 100%; width: 100%; }
-    
-    body {
-      background: #fff4d3;
-      font-family: 'Noto Sans KR', sans-serif;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .book-wrapper {
-      perspective: 1500px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%; height: 100%;
-    }
-
-    .book {
-      transform-style: preserve-3d;
-      transform: rotateX(30deg) rotateY(0deg) rotateZ(-30deg);
-      transition: transform 1s ease-in-out;
-      position: relative;
-      width: 350px; height: 500px;
-      cursor: pointer;
-    }
-
-    @media (max-width: 768px) {
-      .book {
-        transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) !important; 
-        width: 320px; height: 480px;
-      }
-      .book-wrapper { perspective: 800px; overflow: hidden; }
-    }
-
-    .book .side {
-      width: 40px; height: 100%; background: #c75b53;
-      position: absolute; left: -40px; top: 0;
-      transform-origin: 100% 100%; transform: rotateY(-90deg);
-    }
-    .book .bottom {
-      width: 100%; height: 40px; background: #e2e2e2;
-      position: absolute; bottom: 0; left: 0;
-      transform-origin: 100% 100%; transform: rotateX(90deg);
-    }
-    .book .shadow {
-      width: 100%; height: 100%; position: absolute; top: 0; left: 0;
-      background: transparent; transform: translateZ(-40px);
-      box-shadow: -30px 30px 20px rgba(0,0,0,0.3); z-index: 0;
-      transition: opacity 0.5s ease;
-    }
-
-    .book .paper {
-      width: 100%; 
-      height: 100%; 
-      position: absolute; 
-      top: 0; 
-      left: 0;
-      transition: transform 1s;
-      transform-origin: 0 50%; 
-      transform-style: preserve-3d;
-    }
-    
-    .book .paper.open {
-      transform: rotateY(-160deg);
-    }
-
-    .book .page {
-      width: 100%; 
-      height: 100%; 
-      position: absolute;
-      top: 0;
-      left: 0;
-      background-color: #fdfdfd; 
-      overflow: hidden;
-      backface-visibility: hidden; 
-      border: 1px solid #e0e0e0;
-    }
-    
-    .book .page.front { 
-      z-index: 2; 
-      padding: 20px; 
-      display: flex; 
-      flex-direction: column; 
-    }
-    
-    .book .page.back { 
-      z-index: 1; 
-      background-color: #fdfdfd;
-      transform: rotateY(180deg);
-    }
-
-    /* 모눈종이 패턴 - 앞면 */
-    .book .paper:not(#p1) .page.front::before {
-      content: ""; 
-      position: absolute; 
-      top: 0; left: 0; 
-      width: 100%; height: 100%;
-      background-image: 
-        linear-gradient(#e0e0e0 1px, transparent 1px),
-        linear-gradient(90deg, #e0e0e0 1px, transparent 1px);
-      background-size: 20px 20px;
-      opacity: 0.5; 
-      pointer-events: none; 
-      z-index: 0;
-    }
-
-    /* 뒷면 모눈종이 - 연하게 */
-    .book .paper:not(#p1):not(#p5) .page.back::before {
-      content: ""; 
-      position: absolute; 
-      top: 0; left: 0; 
-      width: 100%; height: 100%;
-      background-color: #fdfdfd;
-      background-image: 
-        linear-gradient(#e0e0e0 1px, transparent 1px),
-        linear-gradient(90deg, #e0e0e0 1px, transparent 1px);
-      background-size: 20px 20px;
-      opacity: 0.5; 
-      pointer-events: none; 
-      z-index: 1;
-    }
-
-    /* 초기 z-index */
-    #p1 { z-index: 50; } 
-    #p2 { z-index: 40; } 
-    #p3 { z-index: 30; } 
-    #p4 { z-index: 20; } 
-    #p5 { z-index: 10; }
-
-    /* 디자인 요소 */
-    .hand-font { font-family: 'Nanum Pen Script', cursive; font-size: 1.8rem; color: #444; z-index: 5; }
-    .cute-font { font-family: 'Gaegu', cursive; z-index: 5; }
-    .title-font { font-family: 'Nanum Pen Script', cursive; font-size: 3.5rem; color: #fff; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); }
-
-    /* 표지 스타일 */
-    .cover-page {
-      background-color: #ff8a80 !important; 
-      border-left: 10px solid #c75b53; 
-      color: white;
-      justify-content: center; 
-      align-items: center;
-    }
-    .cover-border { 
-      border: none; 
-      padding: 20px; 
-      width: 80%; 
-      height: 80%; 
-      display: flex; 
-      flex-direction: column; 
-      justify-content: center; 
-      align-items: center; 
-    }
-
-    /* 표지 뒷면 단색 */
-    #p1 .page.back {
-      background-color: #f0f0f0 !important;
-    }
-
-    .sticker {
-      position: absolute;
-      font-size: 3.5rem;
-      z-index: 20;
-      text-shadow: 
-        3px 3px 0 #fff, -3px -3px 0 #fff, 
-        3px -3px 0 #fff, -3px 3px 0 #fff,
-        3px 0px 0 #fff, -3px 0px 0 #fff, 
-        0px 3px 0 #fff, 0px -3px 0 #fff;
-      filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2)); 
-      transform: rotate(10deg);
-      cursor: default;
-    }
-
-    .photo-frame {
-      position: absolute;
-      background: #fff;
-      padding: 5px 5px 25px 5px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-      border: 1px solid #ddd;
-      z-index: 5;
-      transition: transform 0.3s;
-    }
-    .photo-frame:hover { transform: scale(1.05) rotate(0deg) !important; z-index: 25; }
-    .photo-frame img { width: 100%; display: block; }
-    
-    .tape {
-      position: absolute; width: 80px; height: 25px;
-      background-color: rgba(255, 235, 59, 0.7);
-      top: -12px; left: 50%; transform: translateX(-50%) rotate(-2deg);
-      z-index: 30;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-      opacity: 0.8;
-    }
-
-    .bubble {
-      position: absolute;
-      background: #fff;
-      border: 2px solid #444;
-      border-radius: 20px;
-      padding: 10px 15px;
-      font-family: 'Gaegu', cursive;
-      font-size: 1.1rem;
-      box-shadow: 3px 3px 0px rgba(0,0,0,0.1);
-      z-index: 15;
-      text-align: center;
-    }
-    .bubble::after {
-      content: ''; position: absolute; bottom: -12px; left: 20px;
-      border-width: 12px 10px 0; border-style: solid;
-      border-color: #444 transparent; display: block; width: 0;
-    }
-
-    .d-day-box {
-      text-align: center; margin-top: 40px; padding: 20px; z-index: 5;
-      border: 3px dashed #ff80ab; border-radius: 20px; background: #fff0f5;
-    }
-    .count { font-size: 4rem; color: #e91e63; font-family: 'Nanum Pen Script'; font-weight: bold; }
-
-    #loading-screen {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background-color: #fff4d3; z-index: 9999;
-        display: flex; justify-content: center; align-items: center; flex-direction: column;
-        transition: opacity 0.8s;
-    }
-    #loading-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-
-    /* ★★★ 작은 하트 (색상: #f07b71, 사이즈 줄임) ★★★ */
-    .big-heart {
-      width: 50px;
-      height: 50px;
-      background-color: #f07b71;
-      position: relative;
-      transform: rotate(-45deg);
-      animation: heartbeat 1.5s ease-in-out infinite;
-    }
-    .big-heart::before,
-    .big-heart::after {
-      content: "";
-      width: 50px;
-      height: 50px;
-      background-color: #f07b71;
-      border-radius: 50%;
-      position: absolute;
-    }
-    .big-heart::before {
-      top: -25px;
-      left: 0;
-    }
-    .big-heart::after {
-      left: 25px;
-      top: 0;
-    }
-    @keyframes heartbeat {
-      0%, 100% { transform: rotate(-45deg) scale(1); }
-      50% { transform: rotate(-45deg) scale(1.08); }
-    }
-  </style>
+  
+  <!-- 스타일시트 -->
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<div id="loading-screen">
-  <i class="fa-solid fa-heart fa-beat" style="font-size: 4rem; color: #ff8a80;"></i>
-  <p style="margin-top: 20px; font-family: 'Nanum Pen Script'; font-size: 2rem; color: #c75b53;">다이어리 꾸미는 중...</p>
-</div>
-<div id="tsparticles" style="position:fixed; width:100%; height:100%; z-index:0; pointer-events:none;"></div>
-
-<div class="book-wrapper">
-  <div class="book" id="diary-book">
-    <div class="side"></div> 
-    <div class="bottom"></div> 
-    <div class="shadow"></div>
-
-    <!-- 표지 -->
-    <div class="paper" id="p1">
-      <div class="page front cover-page">
-        <div class="cover-border">
-          <h2 class="title-font">Our Love</h2>
-          <h1 class="title-font" style="font-size: 5rem;">Diary</h1>
-          <p class="hand-font" style="color: white; margin-top: 60px;">Scroll or Click →</p>
-        </div>
-      </div>
-      <div class="page back"></div>
-    </div>
-
-    <!-- 페이지 2 -->
-    <div class="paper" id="p2">
-      <div class="page front">
-        <div class="d-day-box">
-          <p class="hand-font">우리가 사랑한 지</p>
-          <div id="d-day-count" class="count">D+1</div>
-          <p style="color: #888; font-size: 0.9rem;">Since 2025.04.13</p>
-        </div>
-        <div style="margin-top: 50px; text-align: center;">
-          <p class="hand-font" style="font-size: 1.6rem;">"매일매일 더 사랑해 💕"</p>
-        </div>
-      </div>
-      <div class="page back"></div>
-    </div>
-
-    <!-- 페이지 3 -->
-    <div class="paper" id="p3">
-      <div class="page front" style="position: relative;"> 
-        <div style="position:absolute; top:20px; left:20px; background:#ffeb3b; padding:5px 15px; transform:rotate(-2deg); font-family:'Gaegu'; font-weight:bold; font-size:1.2rem; box-shadow:2px 2px 2px rgba(0,0,0,0.1); z-index:10;">
-          2025.04.13 ☀️
-        </div>
-
-        <div class="photo-frame" style="width: 150px; top: 70px; left: 15px; transform: rotate(-6deg);">
-          <div class="tape" style="background:rgba(255,150,150,0.6); transform: translateX(-50%) rotate(-5deg);"></div>
-          <img src="https://images.pexels.com/photos/1024960/pexels-photo-1024960.jpeg?auto=compress&cs=tinysrgb&w=400" alt="여의도">
-        </div>
-
-        <div class="photo-frame" style="width: 140px; top: 200px; right: 15px; transform: rotate(4deg);">
-          <div class="tape" style="background:rgba(100,200,255,0.6); transform: translateX(-50%) rotate(3deg);"></div>
-          <img src="https://images.pexels.com/photos/291528/pexels-photo-291528.jpeg?auto=compress&cs=tinysrgb&w=400" alt="디저트">
-        </div>
-
-        <div class="sticker" style="top: 300px; left: 30px;">🌸</div>
-        <div class="sticker" style="top: 150px; right: 10px; font-size: 2.5rem;">🍰</div>
-
-        <div style="position:absolute; bottom:40px; left:20px; width:90%;">
-          <p class="hand-font" style="font-size:1.4rem; line-height:1.4; background:rgba(255,255,255,0.7);">
-            여의도 벚꽃 만개한 날!<br>
-            사람 진짜 많았지만 너무 예뻤다.<br>
-            오빠랑 먹은 케이크도 짱맛 💕
-          </p>
-        </div>
-      </div>
-      <div class="page back"></div>
-    </div>
-
-    <!-- 페이지 4 -->
-    <div class="paper" id="p4">
-      <div class="page front" style="position: relative;">
-        <div class="bubble" style="top: 50px; right: 20px; transform: rotate(5deg);">
-          "오늘부터 우리 1일이야!"
-        </div>
-
-        <div class="photo-frame" style="width: 220px; top: 120px; left: 50%; transform: translateX(-50%) rotate(-2deg); padding-bottom: 40px;">
-          <div class="tape" style="background:rgba(100,255,100,0.5); width:100px;"></div>
-          <img src="https://images.pexels.com/photos/1417255/pexels-photo-1417255.jpeg?auto=compress&cs=tinysrgb&w=400" alt="커플사진">
-          <div class="hand-font" style="text-align:center; margin-top:10px; color:#555;">상호 ❤️ 수완</div>
-        </div>
-
-        <div class="sticker" style="top: 330px; right: 30px; transform: rotate(-10deg);">🥰</div>
-        <div class="sticker" style="top: 360px; left: 20px; font-size: 2.5rem; transform: rotate(15deg);">💌</div>
-
-        <div style="position:absolute; bottom:30px; left:20px; width:90%; background:rgba(255,255,255,0.7); padding:10px; border-radius:10px;">
-          <p class="hand-font" style="font-size:1.3rem;">
-            집 앞 벚꽃나무 아래서...<br>
-            상호 오빠가 고백했다!! (심쿵)<br>
-            내 인생 최고의 날 💖<br>
-            잘 부탁해 내 남자친구!
-          </p>
-        </div>
-      </div>
-      <div class="page back"></div>
-    </div>
-
-    <!-- 페이지 5: 편지 + 뒤표지 -->
-    <div class="paper" id="p5">
-      <div class="page front">
-        <div style="border: 2px solid #ef9a9a; height: 100%; padding: 20px; border-radius: 10px; background:white;">
-          <h2 class="hand-font" style="text-align: center; color: #e91e63;">To. 상호 오빠</h2>
-          <br>
-          <p class="note-line" style="line-height: 2;">
-            항상 내 옆에 있어줘서 고마워.<br>
-            가끔 투정 부려도 다 받아주는<br>
-            오빠가 있어서 나는 세상에서<br>
-            제일 행복한 사람이야.<br><br>
-            우리 앞으로도 예쁜 추억<br>
-            많이 채워나가자!<br>
-            사랑해 ❤️
-          </p>
-        </div>
-      </div>
-      <!-- ★★★ 마지막 페이지 (뒤표지) - 그림자 없음 ★★★ -->
-      <div class="page back" style="background-color: #ff8a80 !important; border-right: 10px solid #c75b53; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: none !important;">
-        <div class="big-heart"></div>
-        <h1 class="title-font" style="font-size: 3.5rem; margin-top: 30px;">...ing</h1>
-        <p class="hand-font" style="color: white; margin-top: 20px; text-align: center; line-height: 1.6;">
-          우리의 이야기는<br>계속됩니다
-        </p>
-        <p style="color: rgba(255,255,255,0.8); margin-top: 30px; font-size: 0.9rem;">
-          To be continued... 💕
-        </p>
-      </div>
-    </div>
-
+  <!-- ========== 로딩 화면 ========== -->
+  <div id="loading-screen">
+    <i class="fa-solid fa-heart fa-beat" style="font-size: 4rem; color: #ff8a80;"></i>
+    <p>다이어리 꾸미는 중...</p>
   </div>
-</div>
 
-<script>
-  const totalPapers = 5;
-  let currentPage = 0; 
-  let isFlipping = false;
+  <!-- ========== 파티클 배경 ========== -->
+  <div id="tsparticles"></div>
 
-  function calcDDay() {
-    const today = new Date(); 
-    const startDate = new Date('2025-04-13'); 
-    const timeDiff = today.getTime() - startDate.getTime();
-    const dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-    const finalDay = dayDiff >= 0 ? dayDiff + 1 : dayDiff; 
-    
-    if (dayDiff >= 0) {
-        document.getElementById('d-day-count').innerText = "D+" + finalDay;
-    } else {
-        document.getElementById('d-day-count').innerText = "D" + finalDay;
-    }
-  }
+  <!-- ========== 다이어리 책 ========== -->
+  <div class="book-wrapper">
+    <div class="book" id="diary-book">
+      <div class="side"></div>
+      <div class="bottom"></div>
+      <div class="shadow"></div>
 
-  function updateBook() {
-    const papers = document.querySelectorAll('.paper');
-    
-    papers.forEach((paper, index) => {
-      if (index < currentPage) {
-        paper.classList.add('open');
-        paper.style.zIndex = 100 + index;
-      } else {
-        paper.classList.remove('open');
-        paper.style.zIndex = 50 - index;
-      }
-    });
+      <!-- ============================== -->
+      <!-- 📕 표지 -->
+      <!-- ============================== -->
+      <div class="paper" id="p1">
+        <div class="page front cover-page">
+          <div class="cover-border">
+            <h2 class="title-font">Our Love</h2>
+            <h1 class="title-font main-title">Diary</h1>
+            <p class="hand-font cover-hint">Scroll or Click →</p>
+          </div>
+        </div>
+        <div class="page back"></div>
+      </div>
 
-    const shadow = document.querySelector('.shadow');
-    const bottom = document.querySelector('.bottom');
-    // ★ 마지막 페이지에서 그림자 + 바닥 완전히 숨김 ★
-    if (currentPage === totalPapers) {
-      shadow.style.display = 'none';
-      bottom.style.display = 'none';
-    } else {
-      shadow.style.display = 'block';
-      bottom.style.display = 'block';
-    }
+      <!-- ============================== -->
+      <!-- 📄 페이지 1: D-Day -->
+      <!-- ============================== -->
+      <div class="paper" id="p2">
+        <div class="page front">
+          <!-- D-Day 박스 -->
+          <div class="d-day-box">
+            <p class="hand-font">우리가 사랑한 지</p>
+            <div id="d-day-count" class="count">D+1</div>
+            <p class="d-day-since">Since 2025.04.13</p>
+          </div>
+          
+          <!-- 메시지 -->
+          <div class="center-message">
+            <p class="hand-font">"매일매일 더 사랑해 💕"</p>
+          </div>
+          
+          <!-- 스티커 -->
+          <div class="sticker heart-sticker" style="top: 30px; right: 20px; font-size: 2.5rem;">💗</div>
+          <div class="sticker" style="bottom: 80px; left: 20px; font-size: 2rem; transform: rotate(-15deg);">🌷</div>
+        </div>
+        <div class="page back"></div>
+      </div>
 
-    const book = document.querySelector('.book');
-    if (window.innerWidth > 768) {
-      if (currentPage > 0) {
-        book.style.transform = 'rotateX(10deg) rotateY(0deg) rotateZ(0deg)';
-      } else {
-        book.style.transform = 'rotateX(30deg) rotateY(0deg) rotateZ(-30deg)';
-      }
-    }
-  }
+      <!-- ============================== -->
+      <!-- 📄 페이지 2: 4월 6일 인천대공원 -->
+      <!-- ============================== -->
+      <div class="paper" id="p3">
+        <div class="page front">
+          <!-- 날짜 스티커 -->
+          <div class="date-sticker" style="top: 15px; left: 15px;">
+            2025.04.06 🌸
+          </div>
 
-  window.addEventListener('wheel', (e) => {
-    if (isFlipping) return;
-    if (e.deltaY > 0 && currentPage < totalPapers) {
-      currentPage++; updateBook();
-    } else if (e.deltaY < 0 && currentPage > 0) {
-      currentPage--; updateBook();
-    }
-    isFlipping = true;
-    setTimeout(() => { isFlipping = false; }, 800);
-  });
+          <!-- 사진 1 -->
+          <div class="photo-frame" style="width: 150px; top: 90px; left: 15px; transform: rotate(-5deg);">
+            <div class="tape tape-pink"></div>
+            <img src="images/250406_image_01.jpg" alt="인천대공원 호수">
+          </div>
 
-  document.querySelectorAll('.paper').forEach(paper => {
-    paper.addEventListener('click', function() {
-      if (this.classList.contains('open')) {
-        if (currentPage > 0) { currentPage--; updateBook(); }
-      } else {
-        if (currentPage < totalPapers) { currentPage++; updateBook(); }
-      }
-    });
-  });
+          <!-- 사진 2 -->
+          <div class="photo-frame" style="width: 130px; top: 180px; right: 20px; transform: rotate(6deg);">
+            <div class="tape tape-blue"></div>
+            <img src="images/250406_image_02.JPG" alt="파란하늘과 벚꽃">
+          </div>
 
-  let touchStartY = 0;
-  window.addEventListener('touchstart', (e) => { touchStartY = e.changedTouches[0].screenY; });
-  window.addEventListener('touchend', (e) => {
-    let touchEndY = e.changedTouches[0].screenY;
-    if (isFlipping) return;
-    if (touchStartY - touchEndY > 50 && currentPage < totalPapers) { 
-      currentPage++; updateBook();
-      isFlipping = true; setTimeout(() => { isFlipping = false; }, 800);
-    } else if (touchEndY - touchStartY > 50 && currentPage > 0) { 
-      currentPage--; updateBook();
-      isFlipping = true; setTimeout(() => { isFlipping = false; }, 800);
-    }
-  });
+          <!-- 말풍선 -->
+          <div class="bubble" style="top: 55px; right: 15px;">
+            첫 벚꽃 보러 간 날~ 🌸
+          </div>
 
-  window.addEventListener('load', () => {
-    calcDDay();
-    
-    tsParticles.load("tsparticles", {
-      "autoPlay": true, "fullScreen": { "enable": true, "zIndex": 0 }, "detectRetina": true, "fpsLimit": 120,
-      "particles": {
-        "color": { "value": "#ffffff" }, "move": { "direction": "bottom", "enable": true, "speed": 1 },
-        "number": { "density": { "enable": true, "area": 800 }, "value": 60 },
-        "opacity": { "value": 0.5 }, "shape": { "type": "circle" }, "size": { "value": { "min": 2, "max": 5 } }
-      }
-    });
-    
-    setTimeout(() => {
-      document.getElementById('loading-screen').classList.add('hidden');
-    }, 800);
-  });
-</script>
+          <!-- 스티커들 -->
+          <div class="sticker" style="top: 250px; left: 100px; font-size: 3rem;">🌸</div>
+          <div class="sticker" style="top: 100px; right: 40px; font-size: 3rem; transform: rotate(-20deg);">🪿</div>
+          <div class="sticker" style="bottom: 100px; right: 25px; font-size: 2.5rem; transform: rotate(15deg);">🦋</div>
 
+          <!-- 일기 내용 -->
+          <div class="diary-text" style="bottom: 10px;">
+            <p class="hand-font">
+              처음에 벚꽃이 아예 없어서<br>
+              당황했었는데 안쪽에 들어가니<br>
+              예쁜 벚꽃나무가 있었엉
+            </p>
+          </div>
+        </div>
+        <div class="page back"></div>
+      </div>
+
+      <!-- ============================== -->
+      <!-- 📄 페이지 3: 4월 6일 첫 셀카 -->
+      <!-- ============================== -->
+      <div class="paper" id="p4">
+        <div class="page front">
+          <!-- 날짜 스티커 -->
+          <div class="date-sticker date-pink" style="top: 15px; right: 15px;">
+            💕 첫 인생네컷 💕
+          </div>
+
+          <!-- 말풍선 -->
+          <div class="bubble tail-right" style="top: 50px; left: 15px;">
+            우리 첫 투샷! 📸
+          </div>
+
+          <!-- 큰 폴라로이드 사진 -->
+          <div class="photo-frame-big" style="top: 100px; left: 50%; transform: translateX(-50%);">
+            <div class="tape tape-hotpink"></div>
+            <img src="images/250406_image_03.jpeg" alt="첫 인생네컷">
+            <div class="photo-caption caption-pink">상호 ♥ 수완</div>
+          </div>
+
+          <!-- 스티커들 -->
+          <div class="sticker heart-sticker" style="top: 120px; left: 20px; font-size: 2.5rem;">💖</div>
+          <div class="sticker" style="top: 100px; right: 25px; font-size: 2.5rem; transform: rotate(-10deg);">✨</div>
+          <div class="sticker" style="bottom: 100px; left: 30px; font-size: 2.5rem; transform: rotate(10deg);">📷</div>
+          <div class="sticker" style="bottom: 80px; right: 35px; font-size: 2.5rem; transform: rotate(-5deg);">🥰</div>
+
+          <!-- 날짜 텍스트 -->
+          <div class="bottom-caption">
+            <p class="hand-font">2025.04.06 첫 인생네컷 💗</p>
+          </div>
+        </div>
+        <div class="page back"></div>
+      </div>
+
+      <!-- ============================== -->
+      <!-- 📄 페이지 4: 4월 13일 여의도 -->
+      <!-- ============================== -->
+      <div class="paper" id="p5">
+        <div class="page front">
+          <!-- 날짜 스티커 -->
+          <div class="date-sticker date-orange" style="top: 15px; left: 15px;">
+            2025.04.10 🌸
+          </div>
+
+          <!-- 사진 1 -->
+          <div class="photo-frame" style="width: 145px; top: 80px; left: 15px; transform: rotate(-4deg);">
+            <div class="tape tape-yellow"></div>
+            <img src="images/250410_image_01.JPG" alt="여의도 벚꽃">
+          </div>
+
+          <!-- 사진 2 -->
+          <div class="photo-frame" style="width: 125px; top: 170px; right: 20px; transform: rotate(5deg);">
+            <div class="tape tape-green"></div>
+            <img src="images/250410_image_02.JPG" alt="벚꽃 하늘">
+          </div>
+
+          <!-- 말풍선 -->
+          <div class="bubble" style="top: 70px; right: 20px;">
+            사람 진짜 많았어😂
+          </div>
+
+          <!-- 스티커들 -->
+          <div class="sticker" style="top: 260px; left: 70px; font-size: 3rem;">💗</div>
+          <div class="sticker" style="top: 100px; right: 80px; font-size: 2.2rem; transform: rotate(10deg);">👩‍❤️‍👨</div>
+          <div class="sticker" style="bottom: 140px; right: 60px; font-size: 2rem; transform: rotate(-10deg);">🫐</div>
+
+          <!-- 일기 내용 -->
+          <div class="diary-text" style="bottom: 25px;">
+            <p class="hand-font">
+              여의도에서 보는 만개한 벚꽃! 🌸<br>
+              인파 미쳤지만 너무 예뻤당~<br>
+              오빠랑 먹은 쉐이크도 맛났엉ㅎㅎ
+            </p>
+          </div>
+        </div>
+        <div class="page back"></div>
+      </div>
+
+      <!-- ============================== -->
+      <!-- 📄 페이지 5: 오빠 인생샷 -->
+      <!-- ============================== -->
+      <div class="paper" id="p6">
+        <div class="page front">
+          <!-- 날짜 스티커 -->
+          <div class="date-sticker date-purple" style="top: 15px; left: 15px;">
+            👑 오빠 인생샷 👑
+          </div>
+
+          <!-- 말풍선 -->
+          <div class="bubble" style="top: 45px; right: 15px;">
+            내가 찍어줬지롱~ 📸
+          </div>
+
+          <!-- 큰 인생사진 -->
+          <div class="photo-frame-big" style="top: 95px; left: 50%; transform: translateX(-50%) rotate(1deg);">
+            <div class="tape tape-lavender"></div>
+            <img src="images/250410_image_03.jpeg" alt="남자친구 인생사진">
+            <div class="photo-caption caption-purple">세상에서 제일 잘생긴 오빠💜</div>
+          </div>
+
+          <!-- 스티커들 -->
+          <div class="sticker heart-sticker" style="top: 110px; left: 15px; font-size: 2.5rem;">💜</div>
+          <div class="sticker" style="top: 130px; right: 40px; font-size: 2.5rem; transform: rotate(15deg);">⭐</div>
+          <div class="sticker" style="bottom: 100px; left: 25px; font-size: 2.5rem; transform: rotate(-8deg);">😍</div>
+          <div class="sticker" style="bottom: 80px; right: 30px; font-size: 2rem; transform: rotate(12deg);">🏆</div>
+
+          <!-- 하단 캡션 -->
+          <div class="bottom-caption">
+            <p class="hand-font">오빠의 첫 배경이미지 등록✨</p>
+          </div>
+        </div>
+
+        <!-- 뒤표지 -->
+        <div class="page back back-cover">
+          <div class="big-heart"></div>
+          <h1 class="title-font back-title">...ing</h1>
+          <p class="hand-font back-message">우리의 이야기는<br>계속됩니다</p>
+          <p class="back-continued">To be continued... 💕</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 스크립트 -->
+  <script src="js/main.js"></script>
 </body>
 </html>
